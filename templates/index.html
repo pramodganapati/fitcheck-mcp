@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitCheck</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background: #1a1a1a;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 { font-size: 24px; letter-spacing: 2px; }
+
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+
+        /* Location form */
+        .location-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .location-bar input, .location-bar select {
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .location-bar button {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .location-bar button:hover { background: #333; }
+
+        /* Outfit section */
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+
+        .outfit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .outfit-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .outfit-card .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .outfit-card .item-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: capitalize;
+        }
+
+        .outfit-card .colour-dot {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+            border: 1px solid #ddd;
+        }
+
+        .outfit-card .meta {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+            text-transform: capitalize;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 10px;
+            text-transform: capitalize;
+        }
+
+        .badge-casual { background: #e8f5e9; color: #2e7d32; }
+        .badge-formal { background: #e3f2fd; color: #1565c0; }
+        .badge-party  { background: #fce4ec; color: #c62828; }
+
+        .no-item {
+            background: #fafafa;
+            border: 2px dashed #ddd;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        /* Wardrobe table */
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #1a1a1a;
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            text-transform: capitalize;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>👔 FitCheck</h1>
+    <span>Your AI Stylist</span>
+</header>
+
+<div class="container">
+
+    <!-- Location + Occasion Form -->
+    <form method="get" action="/ui">
+        <div class="location-bar">
+            <input name="location" value="{{ location }}" placeholder="Enter city (e.g. Pune)">
+            <select name="occasion">
+                <option value="">Any occasion</option>
+                <option value="casual" {% if occasion == 'casual' %}selected{% endif %}>Casual</option>
+                <option value="formal" {% if occasion == 'formal' %}selected{% endif %}>Formal</option>
+                <option value="party" {% if occasion == 'party' %}selected{% endif %}>Party</option>
+            </select>
+            <button type="submit">Get Outfit ✨</button>
+        </div>
+    </form>
+
+    <!-- Outfit Recommendation -->
+    <div class="section-title">Today's Recommendation for {{ location }}</div>
+    <div class="outfit-grid">
+
+        {% for piece in ['top', 'bottom', 'footwear', 'outerwear'] %}
+        {% set item = outfit[piece] %}
+        {% if item and item != 'No ' + piece + ' found' and item is mapping %}
+        <div class="outfit-card">
+            <div class="label">{{ piece }}</div>
+            <div class="item-name">{{ item.colour }} {{ item.type }}</div>
+            <div class="meta">{{ item.material }}</div>
+            <span class="badge badge-{{ item.occasion }}">{{ item.occasion }}</span>
+        </div>
+        {% else %}
+        <div class="no-item">No {{ piece }} found</div>
+        {% endif %}
+        {% endfor %}
+
+    </div>
+
+    <!-- Wardrobe Table -->
+    <div class="section-title">Your Wardrobe ({{ wardrobe|length }} items)</div>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th>Colour</th>
+            <th>Material</th>
+            <th>Occasion</th>
+            <th>Weather</th>
+        </tr>
+        {% for item in wardrobe %}
+        <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.category }}</td>
+            <td>{{ item.product_type }}</td>
+            <td>{{ item.product_colour }}</td>
+            <td>{{ item.product_material }}</td>
+            <td>{{ item.occasion }}</td>
+            <td>{{ item.weather_suitability }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+</body>
+</html>
