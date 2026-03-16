@@ -1,0 +1,27 @@
+# Environment
+.env
+
+# Virtual environment
+.venv/
+
+# Images (personal photos)
+images/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Database
+*.db
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# FastAPI files (in fastapi-approach branch only)
+api.py
+templates/
+static/
