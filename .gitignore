@@ -21,7 +21,3 @@ __pycache__/
 # Logs
 *.log
 
-# FastAPI files (in fastapi-approach branch only)
-api.py
-templates/
-static/
